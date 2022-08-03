@@ -13,7 +13,7 @@ export default function serviceHandler(req, res){
       break
     case 'PUT':
       // Update or create data in your database
-      res.status(200).json({ id, name: `${deviceName}` || `${deviceName}` })
+      res.status(200).json({ id, name: `${deviceName}` })
       break
     default:
       res.setHeader('Allow', ['GET', 'PUT'])

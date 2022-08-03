@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, createContext} from 'react';
+import {CaseFormProvider} from './CaseFormProvider';
 import { useFormik } from "formik";
 import * as yup from 'yup';
 import {
   Button,
   TextField
 } from "@mui/material";
+
+
 
 const validationSchema = yup.object({
   subject: yup.string('Enter a subject that best describes your device issue')
@@ -13,13 +16,15 @@ const validationSchema = yup.object({
     .required('Description is required')
 });
 
-export default function CaseForm(){
-  const [data, setData] = useState([]);
+export const CaseFormContext = createContext([[], () => {}]);
+
+function CaseForm(){
+  const [caseData, setCaseData] = useState([]);
 
   const getData = async () => {
     const response = await fetch('/api/cases');
     const cases = await response.json();
-    setData(cases);
+    setCaseData(cases);
   }
 
   const postData = async (values) => {
@@ -35,7 +40,7 @@ export default function CaseForm(){
     // }
     // const cases = await response.json();
 
-    setData((currentCases) => [...currentCases, { ...values, id: currentCases.length + 1}]);
+    setCaseData((currentCases) => [...currentCases, { ...values, id: currentCases.length + 1}]);
   }
 
   const formik = useFormik({
@@ -55,14 +60,15 @@ export default function CaseForm(){
 
   useEffect(() => {
     //load initial cases for current user
-    getData();
-  }, []);
+      getData();
+  },[]);
 
 
-  console.log('data', data);
+  console.log('cases', caseData);
+
 
   return (
-    <div>
+    <CaseFormContext.Provider value={[caseData, setCaseData]}>
       <form onSubmit={formik.handleSubmit}>
         <div>
           <TextField
@@ -85,6 +91,8 @@ export default function CaseForm(){
           Submit
         </Button>
       </form>
-    </div>
+    </CaseFormContext.Provider>
   )
 }
+export default CaseForm;
+
